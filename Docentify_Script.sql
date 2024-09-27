@@ -247,6 +247,29 @@ CREATE TABLE IF NOT EXISTS StyleVariablesValues
     FOREIGN KEY (variable_id) REFERENCES StyleVariables (id)
 );
 
+DROP TABLE IF EXISTS Cards;
+CREATE TABLE IF NOT EXISTS Cards (
+  id INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(45) NOT NULL,
+  descricao VARCHAR(250) NULL,
+  silhouette_image_url VARCHAR(200) NOT NULL,
+  achieved_image_url VARCHAR(200) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE INDEX nome_UNIQUE (nome ASC) VISIBLE);
+
+DROP TABLE IF EXISTS UserCards;
+CREATE TABLE IF NOT EXISTS UserCards (
+  user_id INT NOT NULL,
+  card_id INT NOT NULL,
+  acquirement_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, card_id),
+  FOREIGN KEY (user_id)
+    REFERENCES Users (id)
+    ON DELETE CASCADE
+  FOREIGN KEY (card_id)
+    REFERENCES Cards (id)
+    ON DELETE CASCADE);
+
 -- Inserir usuários
 INSERT INTO Users (name, birthDate, email, telephone, document)
 VALUES 
