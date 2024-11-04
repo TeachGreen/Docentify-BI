@@ -307,42 +307,20 @@ CREATE TABLE ActivityAttempts (
       ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS Cards;
-CREATE TABLE IF NOT EXISTS Cards (
-  id INT NOT NULL AUTO_INCREMENT,
-  nome VARCHAR(45) NOT NULL,
-  descricao VARCHAR(250) NULL,
-  silhouette_image_url VARCHAR(200) NOT NULL,
-  achieved_image_url VARCHAR(200) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE INDEX nome_UNIQUE (nome ASC) VISIBLE);
-
-DROP TABLE IF EXISTS UserCards;
-CREATE TABLE IF NOT EXISTS UserCards (
-  user_id INT NOT NULL,
-  card_id INT NOT NULL,
-  acquirement_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (user_id, card_id),
-  FOREIGN KEY (user_id)
-    REFERENCES Users (id)
-    ON DELETE CASCADE
-  FOREIGN KEY (card_id)
-    REFERENCES Cards (id)
-    ON DELETE CASCADE);
-
--- Inserir usuários
-INSERT INTO Users (name, birthDate, email, telephone, document)
+-- Inseir Usuários
+INSERT INTO Users (name, birthDate, email, telephone, gender, document)
 VALUES
-    ('João da Silva', '1985-07-20', 'joao.silva@example.com', '11912345678', '12345678901'),
-    ('Maria Oliveira', '1990-11-15', 'maria.oliveira@example.com', '11987654321', '23456789012'),
-    ('Pedro Santos', '1988-03-25', 'pedro.santos@example.com', '11965432198', '34567890123'),
-    ('Ana Paula', '1975-05-10', 'ana.paula@example.com', '11987654329', '98765432100'),
-    ('Carlos Pereira', '1982-09-12', 'carlos.pereira@example.com', '11923456789', '45678901234'),
-    ('Fernanda Lima', '1995-01-25', 'fernanda.lima@example.com', '11954321876', '56789012345'),
-    ('Roberto Nunes', '1992-04-18', 'roberto.nunes@example.com', '11987651234', '67890123456'),
-    ('Juliana Alves', '1987-12-03', 'juliana.alves@example.com', '11965439876', '78901234567'),
-    ('Eduardo Ramos', '1978-11-22', 'eduardo.ramos@example.com', '11934567890', '89012345678'),
-    ('Camila Rodrigues', '1993-08-30', 'camila.rodrigues@example.com', '11923459876', '90123456789');
+    ('João da Silva', '1985-07-20', 'joao.silva@example.com', '11912345678', 'M', '12345678901'),
+    ('Maria Oliveira', '1990-11-15', 'maria.oliveira@example.com', '11987654321', 'F', '23456789012'),
+    ('Pedro Santos', '1988-03-25', 'pedro.santos@example.com', '11965432198', 'M', '34567890123'),
+    ('Ana Paula', '1975-05-10', 'ana.paula@example.com', '11987654329', 'F', '98765432100'),
+    ('Carlos Pereira', '1982-09-12', 'carlos.pereira@example.com', '11923456789', 'M', '45678901234'),
+    ('Fernanda Lima', '1995-01-25', 'fernanda.lima@example.com', '11954321876', 'F', '56789012345'),
+    ('Roberto Nunes', '1992-04-18', 'roberto.nunes@example.com', '11987651234', 'M', '67890123456'),
+    ('Juliana Alves', '1987-12-03', 'juliana.alves@example.com', '11965439876', 'F', '78901234567'),
+    ('Eduardo Ramos', '1978-11-22', 'eduardo.ramos@example.com', '11934567890', 'M', '89012345678'),
+    ('Camila Rodrigues', '1993-08-30', 'camila.rodrigues@example.com', '11923459876', 'F', '90123456789');
+
 
 -- Inserir senhas de usuários
 INSERT INTO UserPasswordHashes (hashedPassword, salt, userId)
@@ -372,6 +350,21 @@ VALUES
     ('Tecnologias Educacionais', 'Curso focado no uso de tecnologia em sala de aula', 0, 0, 1),
     ('Capacitação em Metodologias Ativas', 'Uso de metodologias ativas no ensino superior', 1, 30, 2),
     ('Inovação na Educação', 'Ferramentas inovadoras para o ensino superior', 1, 60, 3);
+    
+-- Inserção de cursos favoritos pelos usuários
+INSERT INTO FavoritedCourses (courseId, userId, favoriteDate)
+VALUES
+    (1, 1, '2024-09-12'),
+    (1, 2, '2024-09-13'),
+    (2, 3, '2024-09-14'),
+    (2, 4, '2024-09-15'),
+    (3, 5, '2024-09-16'),
+    (3, 6, '2024-09-17'),
+    (4, 7, '2024-09-18'),
+    (4, 8, '2024-09-19'),
+    (1, 9, '2024-09-20'),
+    (2, 10, '2024-09-21');
+
 
 -- Inserir matrículas de usuários em cursos
 INSERT INTO Enrollments (enrollmentDate, userId, courseId)
@@ -400,6 +393,28 @@ VALUES
     (8, 89),
     (9, 87),
     (10, 91);
+    
+    -- Inserir cards na tabela Cards
+INSERT INTO Cards (nome, descricao, silhouetteImageUrl, achievedImageUrl)
+VALUES
+    ('Card 1', 'Descrição do Card 1', 'url_silhouette_1', 'url_achieved_1'),
+    ('Card 2', 'Descrição do Card 2', 'url_silhouette_2', 'url_achieved_2'),
+    ('Card 3', 'Descrição do Card 3', 'url_silhouette_3', 'url_achieved_3');
+
+-- Inserir conquistas de cards por usuários
+INSERT INTO UserCards (userId, cardId, acquirement_date)
+VALUES
+    (1, 1, '2024-09-10'),
+    (2, 1, '2024-09-12'),
+    (3, 2, '2024-09-15'),
+    (4, 3, '2024-09-16'),
+    (5, 1, '2024-09-18'),
+    (6, 2, '2024-09-19'),
+    (7, 3, '2024-09-20'),
+    (8, 1, '2024-09-21'),
+    (9, 2, '2024-09-22'),
+    (10, 3, '2024-09-23');
+
 
 -- Inserir preferências de usuários
 INSERT INTO UserPreferences (name, defaultValue)
@@ -432,3 +447,27 @@ VALUES
     (8, 1, '2024-09-09'),
     (9, 1, '2024-09-04'),
     (10, 1, '2024-09-08');
+    
+-- Inserir atividades para passos dos cursos
+INSERT INTO Activities (allowedAttempts, stepId)
+VALUES
+    (3, 1),
+    (5, 2),
+    (4, 3),
+    (3, 4),
+    (2, 5);
+
+-- Inserir tentativas de atividades realizadas pelos usuários
+INSERT INTO ActivityAttempts (score, date, userId, activityId)
+VALUES
+    (80, '2024-09-12', 1, 1),
+    (85, '2024-09-13', 1, 1),
+    (90, '2024-09-14', 2, 2),
+    (70, '2024-09-15', 3, 2),
+    (95, '2024-09-16', 4, 3),
+    (78, '2024-09-17', 5, 4),
+    (88, '2024-09-18', 6, 5),
+    (92, '2024-09-19', 7, 5),
+    (81, '2024-09-20', 8, 4),
+    (79, '2024-09-21', 9, 3),
+    (87, '2024-09-22', 10, 2);
