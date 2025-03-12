@@ -2,312 +2,190 @@ DROP DATABASE IF EXISTS Docentify;
 CREATE DATABASE IF NOT EXISTS Docentify DEFAULT CHARACTER SET utf8;
 USE Docentify;
 
+-- Tabela de Usuários
 DROP TABLE IF EXISTS Users;
 CREATE TABLE IF NOT EXISTS Users
 (
-    id            INT          NOT NULL AUTO_INCREMENT,
-    name          VARCHAR(150) NOT NULL,
-    birthDate     DATE         NOT NULL,
-    email         VARCHAR(100) NOT NULL,
-    telephone     VARCHAR(45)  NULL,
-    gender        CHAR(2)      NULL,
-    document      VARCHAR(45)  NOT NULL,
-    creationDate DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
-    updateDate   DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
+    id             INT          NOT NULL AUTO_INCREMENT,
+    name           VARCHAR(150) NOT NULL,
+    birthDate      DATE         NOT NULL,
+    email          VARCHAR(100) NOT NULL,
+    telephone      VARCHAR(45)  NULL,
+    gender         CHAR(2)      NULL,
+    document       VARCHAR(45)  NOT NULL,
+    creationDate   DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
+    updateDate     DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
+    ultima_interacao DATETIME NULL DEFAULT NULL, 
     PRIMARY KEY (id),
-    UNIQUE INDEX (email ASC) VISIBLE,
-    UNIQUE INDEX (document ASC) VISIBLE
+    UNIQUE INDEX (email ASC),
+    UNIQUE INDEX (document ASC)
 );
 
+-- Tabela de Instituições
 DROP TABLE IF EXISTS Institutions;
 CREATE TABLE IF NOT EXISTS Institutions
 (
-    id        INT          NOT NULL AUTO_INCREMENT,
-    name      VARCHAR(150) NOT NULL,
-    email     VARCHAR(100) NOT NULL,
-    telephone VARCHAR(45)  NULL,
-    address   VARCHAR(350) NULL,
-    document  VARCHAR(45)  NOT NULL,
-    creationDate DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-    updateDate   DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    id            INT          NOT NULL AUTO_INCREMENT,
+    name          VARCHAR(150) NOT NULL,
+    email         VARCHAR(100) NOT NULL,
+    telephone     VARCHAR(45)  NULL,
+    address       VARCHAR(350) NULL,
+    document      VARCHAR(45)  NOT NULL,
+    creationDate  DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
+    updateDate    DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE INDEX (email ASC) VISIBLE,
-    UNIQUE INDEX (name ASC) VISIBLE,
-    UNIQUE INDEX (document ASC) VISIBLE
+    UNIQUE INDEX (email ASC),
+    UNIQUE INDEX (name ASC),
+    UNIQUE INDEX (document ASC)
 );
 
-DROP TABLE IF EXISTS UserPasswordHashes;
-CREATE TABLE IF NOT EXISTS UserPasswordHashes
-(
-    id             INT NOT NULL AUTO_INCREMENT,
-    hashedPassword VARCHAR(100)         NOT NULL,
-    salt           VARCHAR(100)         NOT NULL,
-    userId         INT         NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE
-);
-
+-- Tabela de Cursos
 DROP TABLE IF EXISTS Courses;
 CREATE TABLE IF NOT EXISTS Courses
 (
-    id            INT         NOT NULL AUTO_INCREMENT,
-    name          VARCHAR(45) NOT NULL,
-    description   TEXT        NULL,
-    institutionId INT         NOT NULL,
-    isRequired    BIT  NULL DEFAULT 0,
-    requiredTimeLimit INT    NULL DEFAULT 30,
-    creationDate DATETIME    NULL DEFAULT CURRENT_TIMESTAMP,
-    updateDate   DATETIME    NULL DEFAULT CURRENT_TIMESTAMP,
+    id               INT         NOT NULL AUTO_INCREMENT,
+    name             VARCHAR(100) NOT NULL,
+    description      TEXT        NULL,
+    institutionId    INT         NOT NULL,
+    isRequired       BIT NULL DEFAULT 0,
+    requiredTimeLimit INT NULL DEFAULT 30,
+    creationDate     DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    updateDate       DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    FOREIGN KEY (institutionId) REFERENCES Institutions (id)
-        ON DELETE CASCADE
+    FOREIGN KEY (institutionId) REFERENCES Institutions (id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS FavoritedCourses;
-CREATE TABLE IF NOT EXISTS FavoritedCourses
-(
-    courseId     INT      NOT NULL,
-    userId       INT      NOT NULL,
-    favoriteDate DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (courseId, userId),
-    FOREIGN KEY (courseId) REFERENCES Courses (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS Enrollments;
-CREATE TABLE IF NOT EXISTS Enrollments
-(
-    id             INT      NOT NULL AUTO_INCREMENT,
-    enrollmentDate DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-    isActive       BIT      NULL DEFAULT 1,
-    userId         INT      NOT NULL,
-    courseId       INT      NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (courseId) REFERENCES Courses (id)
-        ON DELETE CASCADE
-);
-
+-- Tabela de Etapas (Steps) dentro dos cursos
 DROP TABLE IF EXISTS Steps;
 CREATE TABLE IF NOT EXISTS Steps
 (
-    id          INT          NOT NULL AUTO_INCREMENT,
-    `order`       INT        NOT NULL,
-    title       VARCHAR(45)  NOT NULL,
-    description VARCHAR(500) NOT NULL,
-    type        INT          NOT NULL,
-    content     TEXT         NOT NULL,
-    courseId    INT          NOT NULL,
+    id          INT NOT NULL AUTO_INCREMENT,
+    `order`     INT NOT NULL,
+    title       VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    type        INT NOT NULL,
+    content     TEXT NOT NULL,
+    courseId    INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (courseId) REFERENCES Courses (id)
-        ON DELETE CASCADE
+    FOREIGN KEY (courseId) REFERENCES Courses (id) ON DELETE CASCADE
 );
 
+-- Tabela de Atividades dentro das etapas dos cursos
 DROP TABLE IF EXISTS Activities;
 CREATE TABLE IF NOT EXISTS Activities
 (
-    id     INT NOT NULL AUTO_INCREMENT,
+    id              INT NOT NULL AUTO_INCREMENT,
     allowedAttempts INT NOT NULL DEFAULT 3,
-    stepId INT NOT NULL,
+    stepId          INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (stepId) REFERENCES Steps (id)
-        ON DELETE CASCADE
+    FOREIGN KEY (stepId) REFERENCES Steps (id) ON DELETE CASCADE
 );
 
+-- Tabela de Matrículas
+DROP TABLE IF EXISTS Enrollments;
+CREATE TABLE IF NOT EXISTS Enrollments
+(
+    id              INT NOT NULL AUTO_INCREMENT,
+    enrollmentDate  DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    isActive        BIT NULL DEFAULT 1,
+    userId          INT NOT NULL,
+    courseId        INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES Users (id) ON DELETE CASCADE,
+    FOREIGN KEY (courseId) REFERENCES Courses (id) ON DELETE CASCADE
+);
+
+-- Tabela de Progresso do Usuário nos Cursos
 DROP TABLE IF EXISTS UserProgress;
 CREATE TABLE IF NOT EXISTS UserProgress
 (
-    enrollmentId INT      NOT NULL,
-    stepId        INT      NOT NULL,
+    enrollmentId  INT NOT NULL,
+    stepId        INT NOT NULL,
     progressDate  DATETIME NOT NULL,
     PRIMARY KEY (enrollmentId, stepId),
-    FOREIGN KEY (stepId) REFERENCES Steps (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (enrollmentId) REFERENCES Enrollments (id)
-        ON DELETE CASCADE
+    FOREIGN KEY (enrollmentId) REFERENCES Enrollments (id) ON DELETE CASCADE,
+    FOREIGN KEY (stepId) REFERENCES Steps (id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS Questions;
-CREATE TABLE IF NOT EXISTS Questions
+-- Tabela de Favoritos (Cursos Favoritados pelos Usuários)
+DROP TABLE IF EXISTS FavoritedCourses;
+CREATE TABLE IF NOT EXISTS FavoritedCourses
 (
-    id         INT  NOT NULL AUTO_INCREMENT,
-    statement  TEXT NOT NULL,
-    activityId INT  NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (activityId) REFERENCES Activities (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS Options;
-CREATE TABLE IF NOT EXISTS Options
-(
-    id         INT     NOT NULL AUTO_INCREMENT,
-    text       TEXT    NOT NULL,
-    isCorrect  TINYINT NULL DEFAULT 0,
-    questionId INT     NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (questionId) REFERENCES Questions (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS FileSteps;
-CREATE TABLE IF NOT EXISTS FileSteps
-(
-    id     INT  NOT NULL AUTO_INCREMENT,
-    data   BLOB NOT NULL,
-    stepId INT  NOT NULL,
-    PRIMARY KEY (id, stepId),
-    FOREIGN KEY (stepId) REFERENCES Steps (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS UserScores;
-CREATE TABLE IF NOT EXISTS UserScores
-(
-    userId INT NOT NULL,
-    score  INT NULL DEFAULT 0,
-    PRIMARY KEY (userId),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS CourseStyles;
-CREATE TABLE IF NOT EXISTS CourseStyles
-(
-    id       INT         NOT NULL AUTO_INCREMENT,
-    name     VARCHAR(45) NULL,
-    courseId INT         NOT NULL,
-    isRequired TINYINT  NULL DEFAULT 0,
-    PRIMARY KEY (id),
-    FOREIGN KEY (courseId) REFERENCES Courses (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS UserPreferences;
-CREATE TABLE IF NOT EXISTS UserPreferences
-(
-    id             INT         NOT NULL AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    defaultValue   VARCHAR(45) NOT NULL,
-    PRIMARY KEY (id)
-);
-
-DROP TABLE IF EXISTS UserPreferencesValues;
-CREATE TABLE IF NOT EXISTS UserPreferencesValues
-(
-    userId       INT         NOT NULL,
-    preferenceId INT         NOT NULL,
-    value        VARCHAR(45) NOT NULL,
-    PRIMARY KEY (userId, preferenceId),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (preferenceId) REFERENCES UserPreferences (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS Associations;
-CREATE TABLE IF NOT EXISTS Associations
-(
+    courseId      INT NOT NULL,
     userId        INT NOT NULL,
-    institutionId INT NOT NULL,
-    PRIMARY KEY (userId, institutionId),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (institutionId) REFERENCES Institutions (id)
-        ON DELETE CASCADE
+    favoriteDate  DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (courseId, userId),
+    FOREIGN KEY (courseId) REFERENCES Courses (id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES Users (id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS StyleVariables;
-CREATE TABLE IF NOT EXISTS StyleVariables
-(
-    id           INT         NOT NULL AUTO_INCREMENT,
-    name         VARCHAR(45) NOT NULL,
-    defaultValue VARCHAR(45) NULL,
-    PRIMARY KEY (id),
-    UNIQUE INDEX (name ASC) VISIBLE
-);
-
-DROP TABLE IF EXISTS StyleVariablesValues;
-CREATE TABLE IF NOT EXISTS StyleVariablesValues
-(
-    styleId    INT         NOT NULL,
-    variableId INT         NOT NULL,
-    value       VARCHAR(45) NOT NULL,
-    PRIMARY KEY (styleId, variableId),
-    FOREIGN KEY (styleId) REFERENCES CourseStyles (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (variableId) REFERENCES StyleVariables (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS InstitutionPasswordHashes;
-CREATE TABLE IF NOT EXISTS InstitutionPasswordHashes
-(
-    id             INT NOT NULL AUTO_INCREMENT,
-    hashedPassword VARCHAR(100)         NOT NULL,
-    salt           VARCHAR(100)         NOT NULL,
-    institutionId  INT         NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (institutionId) REFERENCES Institutions (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS Cards;
-CREATE TABLE IF NOT EXISTS Cards
-(
-    id                   INT          NOT NULL AUTO_INCREMENT,
-    nome                 VARCHAR(45)  NOT NULL,
-    descricao            VARCHAR(250) NULL,
-    silhouetteImageUrl VARCHAR(200) NOT NULL,
-    achievedImageUrl   VARCHAR(200) NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE INDEX (nome ASC) VISIBLE
-);
-
-DROP TABLE IF EXISTS UserCards;
-CREATE TABLE IF NOT EXISTS UserCards
-(
-    userId          INT      NOT NULL,
-    cardId          INT      NOT NULL,
-    acquirement_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (userId, cardId),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (cardId) REFERENCES Cards (id)
-        ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS UserNotifications;
-CREATE TABLE IF NOT EXISTS UserNotifications
-(
-    id                INT          NOT NULL AUTO_INCREMENT,
-    userId           INT          NOT NULL,
-    text              VARCHAR(250) NOT NULL,
-    date              DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id, userId),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-        ON DELETE CASCADE
-);
-
+-- Tabela de Tentativas de Atividades
 DROP TABLE IF EXISTS ActivityAttempts;
-CREATE TABLE ActivityAttempts (
-    id                INT          NOT NULL AUTO_INCREMENT,
-    score             INT          NOT NULL,
-    date              DATETIME     NULL DEFAULT CURRENT_TIMESTAMP,
-    userId           INT          NOT NULL,
-    activityId       INT          NOT NULL,
+CREATE TABLE IF NOT EXISTS ActivityAttempts
+(
+    id          INT NOT NULL AUTO_INCREMENT,
+    score       INT NOT NULL,
+    date        DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    userId      INT NOT NULL,
+    activityId  INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (userId) REFERENCES Users (id)
-      ON DELETE CASCADE,
-    FOREIGN KEY (activityId) REFERENCES Activities (id)
-      ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES Users (id) ON DELETE CASCADE,
+    FOREIGN KEY (activityId) REFERENCES Activities (id) ON DELETE CASCADE
 );
 
--- Inseir Usuários
+-- Atualiza `ultima_interacao` quando um usuário avança no curso
+DELIMITER //
+CREATE TRIGGER atualiza_ultima_interacao
+AFTER INSERT ON UserProgress
+FOR EACH ROW
+BEGIN
+    UPDATE Users 
+    SET ultima_interacao = NOW()
+    WHERE id = (SELECT userId FROM Enrollments WHERE id = NEW.enrollmentId LIMIT 1);
+END;
+//
+DELIMITER ;
+
+-- `ultima_interacao` quando o usuário interage com o chatbot
+DROP TABLE IF EXISTS ChatbotInteractions;
+CREATE TABLE IF NOT EXISTS ChatbotInteractions
+(
+    id               INT NOT NULL AUTO_INCREMENT,
+    userId           INT NOT NULL,
+    question         TEXT NOT NULL,
+    response         TEXT NOT NULL,
+    interactionDate  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
+);
+
+DELIMITER //
+CREATE TRIGGER atualiza_ultima_interacao_chatbot
+AFTER INSERT ON ChatbotInteractions
+FOR EACH ROW
+BEGIN
+    UPDATE Users 
+    SET ultima_interacao = NOW()
+    WHERE id = NEW.userId;
+END;
+//
+DELIMITER ;
+
+-- Tabela de Feedbacks do Chatbot
+DROP TABLE IF EXISTS ChatbotFeedbacks;
+CREATE TABLE IF NOT EXISTS ChatbotFeedbacks
+(
+    id              INT NOT NULL AUTO_INCREMENT,
+    interactionId   INT NOT NULL,
+    userId          INT NOT NULL,
+    rating          TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comments        TEXT NULL,
+    feedbackDate    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (interactionId) REFERENCES ChatbotInteractions(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
+);
+-- usuários
 INSERT INTO Users (name, birthDate, email, telephone, gender, document)
 VALUES
     ('João da Silva', '1985-07-20', 'joao.silva@example.com', '11912345678', 'M', '12345678901'),
@@ -321,153 +199,127 @@ VALUES
     ('Eduardo Ramos', '1978-11-22', 'eduardo.ramos@example.com', '11934567890', 'M', '89012345678'),
     ('Camila Rodrigues', '1993-08-30', 'camila.rodrigues@example.com', '11923459876', 'F', '90123456789');
 
-
--- Inserir senhas de usuários
-INSERT INTO UserPasswordHashes (hashedPassword, salt, userId)
-VALUES
-    ('hash1', 'salt1', 1),
-    ('hash2', 'salt2', 2),
-    ('hash3', 'salt3', 3),
-    ('hash4', 'salt4', 4),
-    ('hash5', 'salt5', 5),
-    ('hash6', 'salt6', 6),
-    ('hash7', 'salt7', 7),
-    ('hash8', 'salt8', 8),
-    ('hash9', 'salt9', 9),
-    ('hash10', 'salt10', 10);
-
--- Inserir instituições
+-- instituições
 INSERT INTO Institutions (name, email, telephone, document, address)
 VALUES
-    ('Universidade Federal', 'contato@ufederal.edu.br', '1134567890', '231', 'Rua tal'),
-    ('Instituto de Educação Superior', 'contato@iesup.com.br', '1187654321', '123', 'Rua tal'),
-    ('Faculdade Privada', 'contato@facprivada.com.br', '1143216789', '321', 'Rua tal');
+    ('Universidade Federal', 'contato@ufederal.edu.br', '1134567890', '231', 'Rua A, 100'),
+    ('Instituto de Educação Superior', 'contato@iesup.com.br', '1187654321', '123', 'Rua B, 200'),
+    ('Faculdade Privada', 'contato@facprivada.com.br', '1143216789', '321', 'Rua C, 300');
 
--- Inserir cursos
+-- cursos
 INSERT INTO Courses (name, description, isRequired, requiredTimeLimit, institutionId)
 VALUES
-    ('Curso de Pedagogia', 'Capacitação em metodologias educacionais modernas', 0, 0,  1),
-    ('Tecnologias Educacionais', 'Curso focado no uso de tecnologia em sala de aula', 0, 0, 1),
-    ('Capacitação em Metodologias Ativas', 'Uso de metodologias ativas no ensino superior', 1, 30, 2),
-    ('Inovação na Educação', 'Ferramentas inovadoras para o ensino superior', 1, 60, 3);
-    
--- Inserção de cursos favoritos pelos usuários
-INSERT INTO FavoritedCourses (courseId, userId, favoriteDate)
-VALUES
-    (1, 1, '2024-09-12'),
-    (1, 2, '2024-09-13'),
-    (2, 3, '2024-09-14'),
-    (2, 4, '2024-09-15'),
-    (3, 5, '2024-09-16'),
-    (3, 6, '2024-09-17'),
-    (4, 7, '2024-09-18'),
-    (4, 8, '2024-09-19'),
-    (1, 9, '2024-09-20'),
-    (2, 10, '2024-09-21');
+    ('Pedagogia Moderna', 'Abordagens contemporâneas para ensino', 1, 30, 1),
+    ('Tecnologia Educacional', 'Uso de tecnologia em sala de aula', 0, 60, 1),
+    ('Metodologias Ativas', 'Metodologias inovadoras no ensino', 1, 45, 2),
+    ('Didática do Ensino Superior', 'Técnicas e práticas pedagógicas', 0, 40, 3),
+    ('Psicopedagogia', 'Fundamentos da psicopedagogia no ensino', 1, 50, 1),
+    ('Ensino Híbrido', 'Integração de ensino presencial e online', 0, 30, 2),
+    ('Educação Inclusiva', 'Adaptações para ensino inclusivo', 1, 60, 3),
+    ('Neuroeducação', 'Ciência cognitiva aplicada ao ensino', 0, 45, 2),
+    ('Gamificação na Educação', 'Uso de gamificação para aprendizado', 0, 30, 3),
+    ('Letramento Digital', 'Ensino de tecnologia para professores', 1, 50, 1);
 
-
--- Inserir matrículas de usuários em cursos
+-- matrículas de usuários em cursos
 INSERT INTO Enrollments (enrollmentDate, userId, courseId)
 VALUES
-    ('2024-09-01', 1, 1),
-    ('2024-09-01', 2, 2),
-    ('2024-08-20', 3, 3),
-    ('2024-09-10', 4, 4),
-    ('2024-09-05', 5, 1),
-    ('2024-09-02', 6, 2),
-    ('2024-08-25', 7, 3),
-    ('2024-09-08', 8, 4),
-    ('2024-09-03', 9, 1),
-    ('2024-09-07', 10, 2);
 
--- Inserir pontuações de usuários
-INSERT INTO UserScores (userId, score)
+    ('2025-01-05', 1, 1),
+    ('2025-01-06', 2, 1),
+    ('2025-01-07', 3, 1),
+    ('2025-01-08', 4, 2),
+    ('2025-01-09', 5, 2),
+    ('2025-01-10', 6, 3),
+    ('2025-01-11', 7, 3),
+    ('2025-01-12', 8, 3),
+    ('2025-01-13', 9, 4),
+    ('2025-01-14', 10, 4),
+    ('2025-01-15', 2, 6),
+    ('2025-01-16', 3, 7),
+    ('2025-01-17', 4, 7),
+    ('2025-01-18', 5, 7),
+    ('2025-01-19', 6, 9),
+    ('2025-01-20', 7, 9);
+
+-- etapas para cursos
+INSERT INTO Steps (`order`, title, description, type, content, courseId)
 VALUES
-    (1, 85),
-    (2, 90),
-    (3, 70),
-    (4, 95),
-    (5, 88),
-    (6, 92),
-    (7, 75),
-    (8, 89),
-    (9, 87),
-    (10, 91);
-    
-    -- Inserir cards na tabela Cards
-INSERT INTO Cards (nome, descricao, silhouetteImageUrl, achievedImageUrl)
-VALUES
-    ('Card 1', 'Descrição do Card 1', 'url_silhouette_1', 'url_achieved_1'),
-    ('Card 2', 'Descrição do Card 2', 'url_silhouette_2', 'url_achieved_2'),
-    ('Card 3', 'Descrição do Card 3', 'url_silhouette_3', 'url_achieved_3');
+    (1, 'Introdução à Pedagogia', 'Conceitos fundamentais', 1, 'Material introdutório', 1),
+    (2, 'Fundamentos Tecnológicos', 'Ferramentas para ensino digital', 2, 'Vídeo explicativo', 2),
+    (3, 'Metodologias Ativas', 'Práticas interativas', 3, 'Atividade prática', 3),
+    (4, 'Didática no Ensino Superior', 'Técnicas para professores', 1, 'Documento PDF', 4),
+    (5, 'Psicopedagogia na Prática', 'Estudos de caso', 2, 'Casos reais', 5),
+    (6, 'Ensino Híbrido e sua Aplicação', 'Como equilibrar o ensino presencial e digital', 3, 'Simulação interativa', 6),
+    (7, 'Educação Inclusiva', 'Acessibilidade no ensino', 1, 'Guia detalhado', 7),
+    (8, 'Neuroeducação Aplicada', 'Como o cérebro aprende', 2, 'Animação ilustrativa', 8),
+    (9, 'Gamificação na Educação', 'Engajamento estudantil', 3, 'Exemplo prático', 9),
+    (10, 'Letramento Digital', 'Habilidades digitais para educadores', 1, 'Manual técnico', 10);
 
--- Inserir conquistas de cards por usuários
-INSERT INTO UserCards (userId, cardId, acquirement_date)
-VALUES
-    (1, 1, '2024-09-10'),
-    (2, 1, '2024-09-12'),
-    (3, 2, '2024-09-15'),
-    (4, 3, '2024-09-16'),
-    (5, 1, '2024-09-18'),
-    (6, 2, '2024-09-19'),
-    (7, 3, '2024-09-20'),
-    (8, 1, '2024-09-21'),
-    (9, 2, '2024-09-22'),
-    (10, 3, '2024-09-23');
-
-
--- Inserir preferências de usuários
-INSERT INTO UserPreferences (name, defaultValue)
-VALUES
-    ('Preferência de Tema', 'Claro'),
-    ('Notificações', 'Ativado'),
-    ('Lembrar login', 'Desativado');
-
--- Inserir etapas dos cursos
-INSERT INTO Steps (`order`, title, description, type, courseId, content)
-VALUES
-    (1, 'Introdução ao curso', 'Introdução', 1, 1, 'texto'),
-    (2, 'Módulo 1: Ferramentas Tecnológicas', 'Módulo 1: Ferramentas Tecnológicas', 2, 1, 'url video'),
-    (1, 'Aula inicial', 'Aula inicial', 1, 2, 'texto'),
-    (2, 'Módulo 1: Metodologias Ativas', 'Módulo 1: Metodologias Ativas', 3, 3, 'explicação antes da atividade'),
-    (1, 'Aula inaugural', 'Aula inaugural', 1, 4, 'texto');
-
--- Inserir progresso dos usuários nos cursos
+-- progresso dos usuários nos cursos
 INSERT INTO UserProgress (enrollmentId, stepId, progressDate)
 VALUES
-    (1, 1, '2024-09-02'),
-    (1, 2, '2024-09-05'),
-    (2, 1, '2024-09-04'),
-    (2, 2, '2024-09-06'),
-    (3, 1, '2024-08-22'),
-    (4, 1, '2024-09-11'),
-    (5, 1, '2024-09-06'),
-    (6, 1, '2024-09-03'),
-    (7, 1, '2024-08-26'),
-    (8, 1, '2024-09-09'),
-    (9, 1, '2024-09-04'),
-    (10, 1, '2024-09-08');
-    
--- Inserir atividades para passos dos cursos
+    (1, 1, '2025-01-06'),
+    (2, 2, '2025-01-07'),
+    (3, 3, '2025-01-08'),
+    (4, 4, '2025-01-09'),
+    (5, 5, '2025-01-10'),
+    (6, 6, '2025-01-11'),
+    (7, 7, '2025-01-12'),
+    (8, 8, '2025-01-13'),
+    (9, 9, '2025-01-14'),
+    (10, 10, '2025-01-15');
+
+-- cursos favoritos dos usuários
+INSERT INTO FavoritedCourses (courseId, userId, favoriteDate)
+VALUES
+    (1, 1, '2025-01-06'),
+    (2, 2, '2025-01-07'),
+    (3, 3, '2025-01-08'),
+    (4, 4, '2025-01-09'),
+    (5, 5, '2025-01-10'),
+    (6, 6, '2025-01-11'),
+    (7, 7, '2025-01-12'),
+    (8, 8, '2025-01-13'),
+    (9, 9, '2025-01-14'),
+    (10, 10, '2025-01-15');
+
+-- atividades para os cursos
 INSERT INTO Activities (allowedAttempts, stepId)
 VALUES
     (3, 1),
-    (5, 2),
-    (4, 3),
+    (3, 2),
+    (3, 3),
     (3, 4),
-    (2, 5);
+    (3, 5),
+    (3, 6),
+    (3, 7),
+    (3, 8),
+    (3, 9),
+    (3, 10);
 
--- Inserir tentativas de atividades realizadas pelos usuários
+-- tentativas de atividades dos usuários
 INSERT INTO ActivityAttempts (score, date, userId, activityId)
 VALUES
-    (80, '2024-09-12', 1, 1),
-    (85, '2024-09-13', 1, 1),
-    (90, '2024-09-14', 2, 2),
-    (70, '2024-09-15', 3, 2),
-    (95, '2024-09-16', 4, 3),
-    (78, '2024-09-17', 5, 4),
-    (88, '2024-09-18', 6, 5),
-    (92, '2024-09-19', 7, 5),
-    (81, '2024-09-20', 8, 4),
-    (79, '2024-09-21', 9, 3),
-    (87, '2024-09-22', 10, 2);
+    (80, '2025-01-07', 1, 1),
+    (85, '2025-01-08', 2, 2),
+    (90, '2025-01-09', 3, 3),
+    (70, '2025-01-10', 4, 4),
+    (95, '2025-01-11', 5, 5),
+    (88, '2025-01-12', 6, 6),
+    (92, '2025-01-13', 7, 7),
+    (87, '2025-01-14', 8, 8),
+    (81, '2025-01-15', 9, 9),
+    (79, '2025-01-16', 10, 10);
+
+-- interações no chatbot
+INSERT INTO ChatbotInteractions (userId, question, response)
+VALUES
+    (1, 'Como acessar meus cursos?', 'Você pode acessar seus cursos na aba "Meus Cursos".'),
+    (2, 'Como gerar o certificado?', 'Seu certificado será gerado automaticamente após a conclusão.');
+
+-- feedback do chatbot
+INSERT INTO ChatbotFeedbacks (interactionId, userId, rating, comments)
+VALUES
+    (1, 1, 5, 'Ótima resposta!'),
+    (2, 2, 4, 'Foi útil, mas poderia ter mais detalhes.');
+
