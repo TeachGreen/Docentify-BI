@@ -185,7 +185,8 @@ CREATE TABLE IF NOT EXISTS ChatbotFeedbacks
     FOREIGN KEY (interactionId) REFERENCES ChatbotInteractions(id) ON DELETE CASCADE,
     FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
 );
--- usuários
+
+-- Usuários
 INSERT INTO Users (name, birthDate, email, telephone, gender, document)
 VALUES
     ('João da Silva', '1985-07-20', 'joao.silva@example.com', '11912345678', 'M', '12345678901'),
@@ -199,63 +200,66 @@ VALUES
     ('Eduardo Ramos', '1978-11-22', 'eduardo.ramos@example.com', '11934567890', 'M', '89012345678'),
     ('Camila Rodrigues', '1993-08-30', 'camila.rodrigues@example.com', '11923459876', 'F', '90123456789');
 
--- instituições
+-- Instituições
 INSERT INTO Institutions (name, email, telephone, document, address)
 VALUES
-    ('Universidade Federal', 'contato@ufederal.edu.br', '1134567890', '231', 'Rua A, 100'),
-    ('Instituto de Educação Superior', 'contato@iesup.com.br', '1187654321', '123', 'Rua B, 200'),
-    ('Faculdade Privada', 'contato@facprivada.com.br', '1143216789', '321', 'Rua C, 300');
+    ('FACENS', 'contato@ufederal.edu.br', '1134567890', '231', 'Rua A, 100'),
+    ('UNIP', 'contato@iesup.com.br', '1187654321', '123', 'Rua B, 200'),
+    ('FATEC', 'contato@facprivada.com.br', '1143216789', '321', 'Rua C, 300');
 
--- cursos
+-- Cursos
 INSERT INTO Courses (name, description, isRequired, requiredTimeLimit, institutionId)
 VALUES
-    ('Pedagogia Moderna', 'Abordagens contemporâneas para ensino', 1, 30, 1),
-    ('Tecnologia Educacional', 'Uso de tecnologia em sala de aula', 0, 60, 1),
-    ('Metodologias Ativas', 'Metodologias inovadoras no ensino', 1, 45, 2),
-    ('Didática do Ensino Superior', 'Técnicas e práticas pedagógicas', 0, 40, 3),
-    ('Psicopedagogia', 'Fundamentos da psicopedagogia no ensino', 1, 50, 1),
-    ('Ensino Híbrido', 'Integração de ensino presencial e online', 0, 30, 2),
-    ('Educação Inclusiva', 'Adaptações para ensino inclusivo', 1, 60, 3),
-    ('Neuroeducação', 'Ciência cognitiva aplicada ao ensino', 0, 45, 2),
-    ('Gamificação na Educação', 'Uso de gamificação para aprendizado', 0, 30, 3),
-    ('Letramento Digital', 'Ensino de tecnologia para professores', 1, 50, 1);
+    ('Análise de Sistemas', 'Curso de desenvolvimento e análise de sistemas', 1, 60, 1),
+    ('Redes de Computadores', 'Estudo das redes e suas infraestruturas', 1, 50, 1),
+    ('Marketing Digital', 'Curso de estratégias de marketing na internet', 0, 45, 2),
+    ('Desenvolvimento Web', 'Tecnologias para desenvolvimento de sites e aplicativos', 1, 60, 2),
+    ('Ciência de Dados', 'Curso de análise e interpretação de dados', 1, 90, 3),
+    ('Gestão de Projetos', 'Planejamento e execução de projetos de TI', 1, 40, 3),
+    ('Administração de Sistemas', 'Curso de administração de servidores e sistemas', 0, 30, 1),
+    ('Engenharia de Software', 'Engenharia para desenvolvimento de software', 1, 70, 2),
+    ('Inteligência Artificial', 'Estudo sobre algoritmos de aprendizado de máquina', 1, 80, 3),
+    ('Sistemas Embarcados', 'Desenvolvimento de sistemas integrados de hardware e software', 0, 50, 1);
 
--- matrículas de usuários em cursos
+-- Matrículas
 INSERT INTO Enrollments (enrollmentDate, userId, courseId)
 VALUES
-
     ('2025-01-05', 1, 1),
-    ('2025-01-06', 2, 1),
-    ('2025-01-07', 3, 1),
-    ('2025-01-08', 4, 2),
-    ('2025-01-09', 5, 2),
-    ('2025-01-10', 6, 3),
-    ('2025-01-11', 7, 3),
-    ('2025-01-12', 8, 3),
-    ('2025-01-13', 9, 4),
-    ('2025-01-14', 10, 4),
-    ('2025-01-15', 2, 6),
-    ('2025-01-16', 3, 7),
-    ('2025-01-17', 4, 7),
-    ('2025-01-18', 5, 7),
-    ('2025-01-19', 6, 9),
-    ('2025-01-20', 7, 9);
+    ('2025-01-05', 1, 2),
+    ('2025-01-06', 1, 3),
+    ('2025-01-06', 1, 4),
+    ('2025-01-07', 2, 1),
+    ('2025-01-07', 2, 2),
+    ('2025-01-08', 2, 5),
+    ('2025-01-08', 2, 6),
+    ('2025-01-09', 3, 3),
+    ('2025-01-09', 3, 7),
+    ('2025-01-10', 4, 5),
+    ('2025-01-10', 4, 8),
+    ('2025-01-11', 5, 4),
+    ('2025-01-11', 5, 9),
+    ('2025-01-12', 6, 2),
+    ('2025-01-12', 6, 3),
+    ('2025-01-13', 7, 1),
+    ('2025-01-13', 7, 7),
+    ('2025-01-14', 8, 3),
+    ('2025-01-14', 8, 8);
 
--- etapas para cursos
+-- Etapas
 INSERT INTO Steps (`order`, title, description, type, content, courseId)
 VALUES
-    (1, 'Introdução à Pedagogia', 'Conceitos fundamentais', 1, 'Material introdutório', 1),
-    (2, 'Fundamentos Tecnológicos', 'Ferramentas para ensino digital', 2, 'Vídeo explicativo', 2),
-    (3, 'Metodologias Ativas', 'Práticas interativas', 3, 'Atividade prática', 3),
-    (4, 'Didática no Ensino Superior', 'Técnicas para professores', 1, 'Documento PDF', 4),
-    (5, 'Psicopedagogia na Prática', 'Estudos de caso', 2, 'Casos reais', 5),
-    (6, 'Ensino Híbrido e sua Aplicação', 'Como equilibrar o ensino presencial e digital', 3, 'Simulação interativa', 6),
-    (7, 'Educação Inclusiva', 'Acessibilidade no ensino', 1, 'Guia detalhado', 7),
-    (8, 'Neuroeducação Aplicada', 'Como o cérebro aprende', 2, 'Animação ilustrativa', 8),
-    (9, 'Gamificação na Educação', 'Engajamento estudantil', 3, 'Exemplo prático', 9),
-    (10, 'Letramento Digital', 'Habilidades digitais para educadores', 1, 'Manual técnico', 10);
+    (1, 'Introdução à Análise de Sistemas', 'Conceitos fundamentais de sistemas', 1, 'Material teórico', 1),
+    (2, 'Configuração de Redes', 'Configuração de redes de computadores', 2, 'Vídeo explicativo', 2),
+    (3, 'SEO e Mídias Sociais', 'Estratégias de SEO para marketing digital', 3, 'Aula prática', 3),
+    (4, 'Fundamentos do Desenvolvimento Web', 'Primeiros passos para criar websites', 1, 'Exercício prático', 4),
+    (5, 'Estatísticas e Probabilidade', 'Fundamentos para análise de dados', 2, 'Aulas gravadas', 5),
+    (6, 'Metodologias Ágeis', 'Gestão de projetos com Scrum', 3, 'Simulação interativa', 6),
+    (7, 'Administração de Banco de Dados', 'Introdução ao gerenciamento de bancos', 1, 'Tutorial passo a passo', 7),
+    (8, 'Desenvolvimento de Software', 'Estruturas de dados e algoritmos', 3, 'Exercício aplicado', 8),
+    (9, 'Aprendizado de Máquina', 'Introdução ao machine learning', 1, 'Material complementar', 9),
+    (10, 'Engenharia de Sistemas Embarcados', 'Desenvolvimento de sistemas para dispositivos', 2, 'Estudo de caso', 10);
 
--- progresso dos usuários nos cursos
+-- Progresso dos usuários
 INSERT INTO UserProgress (enrollmentId, stepId, progressDate)
 VALUES
     (1, 1, '2025-01-06'),
@@ -269,57 +273,16 @@ VALUES
     (9, 9, '2025-01-14'),
     (10, 10, '2025-01-15');
 
--- cursos favoritos dos usuários
+-- Favoritos dos usuários
 INSERT INTO FavoritedCourses (courseId, userId, favoriteDate)
 VALUES
     (1, 1, '2025-01-06'),
-    (2, 2, '2025-01-07'),
-    (3, 3, '2025-01-08'),
-    (4, 4, '2025-01-09'),
-    (5, 5, '2025-01-10'),
-    (6, 6, '2025-01-11'),
-    (7, 7, '2025-01-12'),
-    (8, 8, '2025-01-13'),
-    (9, 9, '2025-01-14'),
-    (10, 10, '2025-01-15');
-
--- atividades para os cursos
-INSERT INTO Activities (allowedAttempts, stepId)
-VALUES
-    (3, 1),
-    (3, 2),
-    (3, 3),
-    (3, 4),
-    (3, 5),
-    (3, 6),
-    (3, 7),
-    (3, 8),
-    (3, 9),
-    (3, 10);
-
--- tentativas de atividades dos usuários
-INSERT INTO ActivityAttempts (score, date, userId, activityId)
-VALUES
-    (80, '2025-01-07', 1, 1),
-    (85, '2025-01-08', 2, 2),
-    (90, '2025-01-09', 3, 3),
-    (70, '2025-01-10', 4, 4),
-    (95, '2025-01-11', 5, 5),
-    (88, '2025-01-12', 6, 6),
-    (92, '2025-01-13', 7, 7),
-    (87, '2025-01-14', 8, 8),
-    (81, '2025-01-15', 9, 9),
-    (79, '2025-01-16', 10, 10);
-
--- interações no chatbot
-INSERT INTO ChatbotInteractions (userId, question, response)
-VALUES
-    (1, 'Como acessar meus cursos?', 'Você pode acessar seus cursos na aba "Meus Cursos".'),
-    (2, 'Como gerar o certificado?', 'Seu certificado será gerado automaticamente após a conclusão.');
-
--- feedback do chatbot
-INSERT INTO ChatbotFeedbacks (interactionId, userId, rating, comments)
-VALUES
-    (1, 1, 5, 'Ótima resposta!'),
-    (2, 2, 4, 'Foi útil, mas poderia ter mais detalhes.');
-
+    (2, 1, '2025-01-06'),
+    (3, 1, '2025-01-07'),
+    (4, 1, '2025-01-07'),
+    (5, 2, '2025-01-08'),
+    (6, 2, '2025-01-08'),
+    (7, 3, '2025-01-09'),
+    (8, 3, '2025-01-09'),
+    (9, 4, '2025-01-10'),
+    (10, 4, '2025-01-10');
