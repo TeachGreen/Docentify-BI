@@ -27,13 +27,13 @@ tokenizer_bertimbau = AutoTokenizer.from_pretrained("neuralmind/bert-base-portug
 # Lista de intenções e embeddings
 lista_intencoes = [
     "progresso",
-    "tempo_conclusao",  # precisa vir antes de 'duracao' e 'meus_cursos'
-    "proximo_modulo",   # também sobreposto por 'meus_cursos'
-    "obrigatorios",     # frequentemente confundido
-    "duracao",          # sobrepõe 'tempo_conclusao'
-    "cancelamento",     # confundido com suporte ou meus_cursos
-    "atividades",       # confundido com 'meus_cursos'
-    "alterar_email",    # confundido com 'suporte'
+    "tempo_conclusao",  
+    "proximo_modulo",   
+    "obrigatorios",     
+    "duracao",          
+    "cancelamento",     
+    "atividades",       
+    "alterar_email",    
     "instituicao",
     "certificado",
     "senha",
@@ -204,14 +204,14 @@ def detectar_por_lematizacao_otimizado(texto, lista_intencoes, lemas_por_intenca
             scores[intencao] = 0
 
     melhor_intencao = max(scores, key=scores.get)
-    if scores[melhor_intencao] > 0.2:  # Ajuste este limiar conforme necessário
+    if scores[melhor_intencao] > 0.2:  
         return melhor_intencao
     return None
 
 def corrigir_palavras(texto):
     palavras = texto.lower().split()
     for palavra in palavras:
-        resultado = process.extractOne(palavra, lista_intencoes, score_cutoff=85) # Aumentando score_cutoff para 85
+        resultado = process.extractOne(palavra, lista_intencoes, score_cutoff=85) 
         if resultado:
             return resultado[0]
     return None
@@ -219,7 +219,7 @@ def corrigir_palavras(texto):
 def buscar_intencao_com_embeddings(pergunta):
     pergunta_embed = modelo_embeddings.encode([pergunta])
     similaridade = cosine_similarity(pergunta_embed, intencoes_embeddings)
-    if similaridade[0].max() < 0.65: # Reduzindo o limite mínimo de similaridade para 0.65
+    if similaridade[0].max() < 0.65:
         return None
     return lista_intencoes[similaridade[0].argmax()]
 
